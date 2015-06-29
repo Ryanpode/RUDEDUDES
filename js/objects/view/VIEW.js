@@ -1,0 +1,3 @@
+define({
+	//defining VIEW namespace
+});
