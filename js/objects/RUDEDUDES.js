@@ -1,5 +1,5 @@
-define({
-	encounter: function(myDude, enemyDude){
+var RUDEDUDES = (function (my) {
+	my.encounter = function(myDude, enemyDude){
 		this.myDude = myDude;
 		this.enemyDude = enemyDude;
 		
@@ -13,8 +13,8 @@ define({
 		};
 		
 		return this;
-	},
-	dude: function(dudeConfig, dudeList, moveList){
+	};
+	my.dude = function(dudeConfig, dudeList, moveList){
 		this.dudeID = dudeConfig.dudeID;
 		this.dudeInfo = dudeList.getDude(dudeConfig.dudeID);
 		this.stats = {
@@ -37,15 +37,15 @@ define({
 			ult: moveList.getMove(dudeConfig.moves.ult)
 		};
 		return this;
-	},
-	stats: function(HP, Atk, Def, Spd){
+	};
+	my.stats = function(HP, Atk, Def, Spd){
 		this.HP = HP;
 		this.Atk = Atk;
 		this.Def = Def;
 		this.Spd = Spd;
 		return this;
-	},
-	dudeList: function() {
+	};
+	my.dudeList = function() {
 		var dudes = [
 			{
 				name: 'Cool Guy',
@@ -61,8 +61,8 @@ define({
 			dudes: dudes,
 			getDude: getDude
 		}
-	},
-	move: function(moveName, moveType, moveClass, moveBase, moveDescription, moveEffects){
+	};
+	my.move = function(moveName, moveType, moveClass, moveBase, moveDescription, moveEffects){
 		this.moveName = moveName;
 		this.moveType = moveType;
 		this.moveClass = moveClass;
@@ -70,7 +70,7 @@ define({
 		this.moveDescription = moveDescription;
 		this.moveEffects = moveEffects;
 	},
-	moveEffects: function(RUDEDUDES){
+	my.moveEffects = function(RUDEDUDES){
 		this.getTypeMultiplier = function(attackType, dudeType) {
 			switch (attackType) {
 				case 'Water':
@@ -111,8 +111,8 @@ define({
 			console.log(encounter.enemyDude.stats);
 		};
 		return this;
-	},
-	moveList: function(RUDEDUDES){
+	};
+	my.moveList = function(RUDEDUDES){
 		var moves = [
 			new RUDEDUDES.move('Watershot', 'Water', 'AtWill', '2', 'Shoots water', ['damageTarget']),
 			new RUDEDUDES.move('Firestick', 'Fire', 'AtWill', '2', 'Hit him with a firestick', ['damageTarget'])
@@ -123,7 +123,7 @@ define({
 			getMove: getMove
 		}
 	},
-	encounterCanvas: function(width, height) {
+	my.encounterCanvas = function(width, height) {
 		this.width = width;
 		this.height = height;
 		
@@ -253,5 +253,6 @@ define({
 		};
 		
 		return this;
-	}
-});
+	};
+	return my;
+}(RUDEDUDES || {}));

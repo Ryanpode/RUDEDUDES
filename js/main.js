@@ -1,17 +1,10 @@
 var canvasWidth = 640;
 var canvasHeight = 360;
 
-requirejs.config({
-    baseUrl: 'js/objects',
-});
 
-//define RUDEDUDES
-requirejs(['RUDEDUDES'], function (RUDEDUDES) {
-	test(RUDEDUDES);
-});
-
-var test = function(RUDEDUDES) {
-	//console.log(RUDEDUDES);
+var test = function() {
+	console.log(RUDEDUDES);
+	
 	var stats1 = new RUDEDUDES.stats(100,3,4,5);
 	var dudeList = new RUDEDUDES.dudeList();
 	var moveList = new RUDEDUDES.moveList(RUDEDUDES);
@@ -52,3 +45,4 @@ var test = function(RUDEDUDES) {
 	}, 1000);
 };
 
+test();
