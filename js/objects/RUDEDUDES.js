@@ -1,4 +1,4 @@
-var RUDEDUDES = (function (my) {
+var RUDEDUDES = (function (my, $) {
 	my.encounter = function(myDude, enemyDude){
 		this.myDude = myDude;
 		this.enemyDude = enemyDude;
@@ -127,7 +127,7 @@ var RUDEDUDES = (function (my) {
 		this.width = width;
 		this.height = height;
 		
-		var game_el = document.querySelector('#game');
+		var game_el = $('#game')[0];
 		this.stage = new Kinetic.Stage({container: game_el, width: this.width, height: this.height})
 		
 		var layer_names = ['background', 'dudes', 'animations', 'HUD'];
@@ -145,6 +145,7 @@ var RUDEDUDES = (function (my) {
 
 			var canvasWidth = canvas.stage.width();
 			var canvasHeight = canvas.stage.height();
+			var textPaddingRatio = .02
 			var xPaddingRatio = .05;
 			var yPaddingRatio = .05;
 			var xRatio = .35;
@@ -153,6 +154,7 @@ var RUDEDUDES = (function (my) {
 			var xEnemyTotal = canvasWidth - canvasWidth*xRatio - canvasWidth*(xPaddingRatio);
 			var y = canvasHeight * yPaddingRatio;
 			var height = canvasHeight * yRatio;
+			var yText = y + canvasHeight * textPaddingRatio + height
 			var width = xRatio * canvasWidth;
 			var widthMyHP = canvasWidth * xRatio * (encounter.myDude.stats.HP / encounter.myDude.defaultStats.HP);
 			var widthEnemyHP = canvasWidth * xRatio * (encounter.enemyDude.stats.HP / encounter.enemyDude.defaultStats.HP);
@@ -171,10 +173,21 @@ var RUDEDUDES = (function (my) {
 				y: y,
 				width: widthMyHP,
 				height: height,
+				fill: 'black',
 				fill: 'green'
+			});
+			var textMyDude = new Kinetic.Text({
+				x: xMyTotal,
+				y: yText,
+				width: width,
+				height: height,
+				align: 'left',
+				fill: 'black',
+				text: encounter.myDude.dudeInfo.name
 			});
 			canvas.layers.HUD.add(rectMyBox);
 			canvas.layers.HUD.add(rectMyHP);
+			canvas.layers.HUD.add(textMyDude);
 			
 			//create enemy dude
 			var rectEnemyBox = new Kinetic.Rect({
@@ -192,8 +205,18 @@ var RUDEDUDES = (function (my) {
 				height: height,
 				fill: 'green'
 			});
+			var textEnemyDude = new Kinetic.Text({
+				x: xEnemyTotal,
+				y: yText,
+				width: width,
+				height: height,
+				align: 'right',
+				fill: 'black',
+				text: encounter.enemyDude.dudeInfo.name
+			});
 			canvas.layers.HUD.add(rectEnemyBox);
 			canvas.layers.HUD.add(rectEnemyHP);
+			canvas.layers.HUD.add(textEnemyDude);
 			
 			//draw it :) 
 			canvas.layers.HUD.draw();
@@ -255,4 +278,4 @@ var RUDEDUDES = (function (my) {
 		return this;
 	};
 	return my;
-}(RUDEDUDES || {}));
+}(RUDEDUDES || {}, jQuery));

@@ -44,5 +44,3 @@ var test = function() {
 		cnv.drawHUD(encounter,RUDEDUDES);
 	}, 1000);
 };
-
-test();
