@@ -1,9 +1,15 @@
 var RUDEDUDES = (function (my, $) {
-	my.encounter = function(myDude, enemyDude){
-		this.myDude = myDude;
-		this.enemyDude = enemyDude;
+	my.encounter = function(myPlayer, enemyPlayer){
+		var encounter = this;
+
+		encounter.myPlayer = myPlayer;
+		encounter.enemyPlayer = enemyPlayer;
+
+		encounter.myDude = myPlayer.getStartingDude();
+		encounter.enemyDude = enemyPlayer.getStartingDude();
+
 		
-		this.compareSpeed = function() {
+		encounter.compareSpeed = function() {
 			//get the effective speed, taking stats, status, and abilities into consideration
 			var getEffectiveSpeed = function(dude) {
 				return dude.stats.Spd;
@@ -12,38 +18,59 @@ var RUDEDUDES = (function (my, $) {
 			return getEffectiveSpeed(myDude) - getEffectiveSpeed(enemyDude);
 		};
 		
-		return this;
+		return encounter;
+	};
+	my.player = function(dudes){
+		var player = this;
+
+		player.dudes = dudes;
+
+		player.getStartingDude = function(){
+			for (var i = 0; i < player.dudes.length; i++) {
+				if(player.dudes[i].stats.HP > 0) {
+					return player.dudes[i];
+				}
+			};
+			return -1;
+		};
+
+		return player;
 	};
 	my.dude = function(dudeConfig, dudeList, moveList){
-		this.dudeID = dudeConfig.dudeID;
-		this.dudeInfo = dudeList.getDude(dudeConfig.dudeID);
-		this.stats = {
+		var dude = this;
+
+		dude.dudeID = dudeConfig.dudeID;
+		dude.dudeInfo = dudeList.getDude(dudeConfig.dudeID);
+		dude.stats = {
 			HP: dudeConfig.dudeStats.HP,
 			Atk: dudeConfig.dudeStats.Atk,
 			Def: dudeConfig.dudeStats.Def,
 			Spd: dudeConfig.dudeStats.Spd
 		};
-		this.defaultStats = {
+		dude.defaultStats = {
 			HP: dudeConfig.dudeDefaultStats.HP,
 			Atk: dudeConfig.dudeDefaultStats.Atk,
 			Def: dudeConfig.dudeDefaultStats.Def,
 			Spd: dudeConfig.dudeDefaultStats.Spd
 		};
-		this.moves = {
+		dude.moves = {
 			passive: moveList.getMove(dudeConfig.moves.passive),
 			ability1: moveList.getMove(dudeConfig.moves.ability1),
 			ability2: moveList.getMove(dudeConfig.moves.ability2),
 			ability3: moveList.getMove(dudeConfig.moves.ability3),
 			ult: moveList.getMove(dudeConfig.moves.ult)
 		};
-		return this;
+
+		return dude;
 	};
 	my.stats = function(HP, Atk, Def, Spd){
-		this.HP = HP;
-		this.Atk = Atk;
-		this.Def = Def;
-		this.Spd = Spd;
-		return this;
+		var stats = this;
+
+		stats.HP = HP;
+		stats.Atk = Atk;
+		stats.Def = Def;
+		stats.Spd = Spd;
+		return stats;
 	};
 	my.dudeList = function() {
 		var dudes = [
@@ -54,6 +81,14 @@ var RUDEDUDES = (function (my, $) {
 			{
 				name: 'Tom',
 				type: 'Fire'
+			},
+			{
+				name: 'Keith',
+				type: 'Normal'
+			},
+			{
+				name: 'Laika',
+				type: 'Dark'
 			}
 		];
 		var getDude = function(index){return this.dudes[index];}
@@ -63,12 +98,16 @@ var RUDEDUDES = (function (my, $) {
 		}
 	};
 	my.move = function(moveName, moveType, moveClass, moveBase, moveDescription, moveEffects){
-		this.moveName = moveName;
-		this.moveType = moveType;
-		this.moveClass = moveClass;
-		this.moveBase = moveBase;
-		this.moveDescription = moveDescription;
-		this.moveEffects = moveEffects;
+		var move = this;
+
+		move.moveName = moveName;
+		move.moveType = moveType;
+		move.moveClass = moveClass; 
+		move.moveBase = moveBase;
+		move.moveDescription = moveDescription;
+		move.moveEffects = moveEffects;
+
+		return move;
 	},
 	my.moveEffects = function(RUDEDUDES){
 		this.getTypeMultiplier = function(attackType, dudeType) {
@@ -122,26 +161,28 @@ var RUDEDUDES = (function (my, $) {
 			moves: moves,
 			getMove: getMove
 		}
-	},
+	};
 	my.encounterCanvas = function(width, height) {
-		this.width = width;
-		this.height = height;
+		var encounterCanvas = this;
+
+		encounterCanvas.width = width;
+		encounterCanvas.height = height;
 		
 		var game_el = $('#game')[0];
-		this.stage = new Kinetic.Stage({container: game_el, width: this.width, height: this.height})
+		encounterCanvas.stage = new Kinetic.Stage({container: game_el, width: encounterCanvas.width, height: encounterCanvas.height})
 		
 		var layer_names = ['background', 'dudes', 'animations', 'HUD'];
-		this.layers = {};
+		encounterCanvas.layers = {};
 		for (i = 0; i < layer_names.length ; i++){
-			this.stage.add(this.layers[layer_names[i]] = new Kinetic.Layer({id: layer_names[i]})); 
+			encounterCanvas.stage.add(encounterCanvas.layers[layer_names[i]] = new Kinetic.Layer({id: layer_names[i]})); 
 		}
-		this.drawHUD = function(encounter, RUDEDUDES) {
-			this.layers.HUD.removeChildren();
-			this.drawMoveButtons(encounter, RUDEDUDES);
-			this.drawTopHUD(encounter, RUDEDUDES);
+		encounterCanvas.drawHUD = function(encounter, RUDEDUDES) {
+			encounterCanvas.layers.HUD.removeChildren();
+			encounterCanvas.drawMoveButtons(encounter, RUDEDUDES);
+			encounterCanvas.drawTopHUD(encounter, RUDEDUDES);
 		};
-		this.drawTopHUD = function(encounter, RUDEDUDES) {
-			var canvas = this;
+		encounterCanvas.drawTopHUD = function(encounter, RUDEDUDES) {
+			var canvas = encounterCanvas;
 
 			var canvasWidth = canvas.stage.width();
 			var canvasHeight = canvas.stage.height();
