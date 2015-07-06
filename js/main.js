@@ -1,33 +1,21 @@
 var canvasWidth = 640;
 var canvasHeight = 360;
 
+var TopDownGame = TopDownGame || {};
 
-var test = function() {
+TopDownGame.game = new Phaser.Game(160, 160, Phaser.AUTO, '');
 
-	var game = new Phaser.Game(800, 600, Phaser.AUTO, 'game', { preload: preload, create: create, update: update });
+TopDownGame.game.state.add('Boot', TopDownGame.Boot);
+TopDownGame.game.state.add('Preload', TopDownGame.Preload);
+TopDownGame.game.state.add('Game', TopDownGame.Game);
+TopDownGame.game.state.add('Encounter', TopDownGame.Encounter);
 
-	function preload() { 
-		
-		// Add the Isometric plug-in to Phaser
-	    game.plugins.add(new Phaser.Plugin.Isometric(game));
+TopDownGame.game.state.start('Boot');
 
-	 	// Set the world size
-	    game.world.setBounds(0, 0, 2048, 1024);
+	
 
-	 	// Start the physical system
-	    game.physics.startSystem(Phaser.Plugin.Isometric.ISOARCADE);
-
-	 	// set the middle of the world in the middle of the screen
-	    game.iso.anchor.setTo(0.5, 0);
-	}
-
-	function create() {
-	}
-
-	function update() {
-	}
-
-	/*console.log(RUDEDUDES);
+function startEncounter (){
+	console.log(RUDEDUDES);
 	
 	var stats1 = new RUDEDUDES.stats(100,3,4,5);
 	var dudeList = new RUDEDUDES.dudeList();
@@ -81,5 +69,7 @@ var test = function() {
 	var cnv = new RUDEDUDES.encounterCanvas(640, 360);
 	window.setInterval(function(){
 		cnv.drawHUD(encounter,RUDEDUDES);
-	}, 1000);*/
+	}, 1000);
 };
+
+
