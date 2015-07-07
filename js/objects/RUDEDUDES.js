@@ -163,29 +163,22 @@ var RUDEDUDES = (function (my, $) {
 		}
 	};
 	my.encounterCanvas = function(width, height) {
+		console.log('encounterCanvas init');
 		var encounterCanvas = this;
 
 		encounterCanvas.width = width;
 		encounterCanvas.height = height;
 		
-		var game_el = $('#game')[0];
-		encounterCanvas.stage = new Kinetic.Stage({container: game_el, width: encounterCanvas.width, height: encounterCanvas.height})
-		
-		var layer_names = ['background', 'dudes', 'animations', 'HUD'];
-		encounterCanvas.layers = {};
-		for (i = 0; i < layer_names.length ; i++){
-			encounterCanvas.stage.add(encounterCanvas.layers[layer_names[i]] = new Kinetic.Layer({id: layer_names[i]})); 
-		}
-		encounterCanvas.drawHUD = function(encounter, RUDEDUDES) {
-			encounterCanvas.layers.HUD.removeChildren();
-			encounterCanvas.drawMoveButtons(encounter, RUDEDUDES);
-			encounterCanvas.drawTopHUD(encounter, RUDEDUDES);
+		encounterCanvas.drawHUD = function(RudeDudesGame, encounter, RUDEDUDES) {
+			//encounterCanvas.layers.HUD.removeChildren();
+			encounterCanvas.drawMoveButtons(RudeDudesGame, encounter, RUDEDUDES);
+			//encounterCanvas.drawTopHUD(RudeDudesGame, encounter, RUDEDUDES);
 		};
-		encounterCanvas.drawTopHUD = function(encounter, RUDEDUDES) {
+		encounterCanvas.drawTopHUD = function(RudeDudesGame, encounter, RUDEDUDES) {
 			var canvas = encounterCanvas;
 
-			var canvasWidth = canvas.stage.width();
-			var canvasHeight = canvas.stage.height();
+			var canvasWidth = encounterCanvas.width;
+			var canvasHeight = encounterCanvas.width;
 			var textPaddingRatio = .02
 			var xPaddingRatio = .05;
 			var yPaddingRatio = .05;
@@ -264,26 +257,39 @@ var RUDEDUDES = (function (my, $) {
 			
 		};
 		
-		this.drawMoveButtons = function(encounter, RUDEDUDES) {
+		this.drawMoveButtons = function(RudeDudesGame, encounter, RUDEDUDES) {
 			
 			var moveEffects = new RUDEDUDES.moveEffects(RUDEDUDES);
 			var drawButton = function(xRatio,sideRatio,defaultText,move,encounter,canvas){
 				
-				var color = 'rgba(125,125,125,.7)';
+				var color = 0x888888;
 				var text = defaultText;
 				var moveEffect = function(){};
 				
 				if (move !== undefined) {
-					color = 'rgba(0,125,0,1)'
+					color = 0x008800
 					text = move.moveName;
 					moveEffect = function(){moveEffects.useMove(move, encounter.myDude, encounter.enemyDude, encounter)};
 				};
 				
-				var sideLength = canvas.stage.width() * sideRatio;
-				var x = canvas.stage.width() * xRatio;
-				var y = canvas.stage.height() - sideLength;
+				var sideLength = encounterCanvas.width * sideRatio;
+				var x = encounterCanvas.width * xRatio;
+				var y = encounterCanvas.height - sideLength;
 				var fontSize = sideLength * .15;
-				
+				var yText = y  + sideLength / 2 - fontSize / 2;
+
+				var sprite = RudeDudesGame.game.add.sprite(x,y);
+			    var graphics = RudeDudesGame.game.add.graphics(0,0);
+			    var text = RudeDudesGame.game.add.text(0,sideLength / 2,text,{'fontSize':fontSize,'align':'center','width':sideLength});
+
+
+			      // set a fill and line style
+			    graphics.beginFill(color);
+			    graphics.lineStyle(1, 'black', 1);
+
+			    graphics.drawRect(0,0,sideLength,sideLength);
+			    
+			    // draw a shape
 				var btn = new Kinetic.Rect({
 					x: x,
 					y: y,
@@ -294,9 +300,15 @@ var RUDEDUDES = (function (my, $) {
 					fill: color
 				});
 				
-				btn.on('click', moveEffect);
+				sprite.addChild(graphics);
+				sprite.addChild(text);
+
+				sprite.inputEnabled = true;
+				sprite.events.onInputDown.add(function(){console.log(moveEffect)}, this);
+/**/
+				//btn.on('click', moveEffect);
 				
-				canvas.layers.HUD.add(btn);
+			/*	canvas.layers.HUD.add(btn);
 				canvas.layers.HUD.add(new Kinetic.Text({
 					x: x,
 					y: y  + sideLength / 2 - fontSize / 2,
@@ -306,7 +318,7 @@ var RUDEDUDES = (function (my, $) {
 					fontSize: fontSize,
 					fill: 'black'
 				}));
-				canvas.layers.HUD.draw();
+				canvas.layers.HUD.draw();*/
 			};
 			
 			drawButton((3/16),.125,'(Passive)',encounter.myDude.moves.passive,encounter,this);

@@ -1,8 +1,8 @@
 
-var TopDownGame = TopDownGame || {};
-TopDownGame.Boot = function(){};
+var RudeDudesGame = RudeDudesGame || {};
+RudeDudesGame.Boot = function(){};
 //setting game configuration and loading the assets for the loading screen
-TopDownGame.Boot.prototype = {
+RudeDudesGame.Boot.prototype = {
   preload: function() {
     //assets we'll use in the loading screen
     this.load.image('preloadbar', 'assets/images/preloader-bar.png');
@@ -31,8 +31,8 @@ TopDownGame.Boot.prototype = {
 
 
 //loading the game assets
-TopDownGame.Preload = function(){};
-TopDownGame.Preload.prototype = {
+RudeDudesGame.Preload = function(){};
+RudeDudesGame.Preload.prototype = {
   preload: function() {
     //show loading screen
     this.preloadBar = this.add.sprite(this.game.world.centerX, this.game.world.centerY + 128, 'preloadbar');
@@ -53,8 +53,8 @@ TopDownGame.Preload.prototype = {
 
 
 //title screen
-TopDownGame.Game = function(){};
-TopDownGame.Game.prototype = {
+RudeDudesGame.Game = function(){};
+RudeDudesGame.Game.prototype = {
   create: function() {
     this.map = this.game.add.tilemap('level1');
 
@@ -67,7 +67,7 @@ TopDownGame.Game.prototype = {
     //this.grassLayer = this.map.createLayer('Grass');
 
     //collision on blockedLayer
-    this.map.setCollisionBetween(1, 2000, true, 'Blocked');
+    this.map.setCollisionBetween(1, 5000, true, 'Blocked');
 
     //resizes the game world to match the layer dimensions
     this.backgroundlayer.resizeWorld();
@@ -158,50 +158,67 @@ TopDownGame.Game.prototype = {
   }
 };
 //encounter
-TopDownGame.Encounter = function(){};
-TopDownGame.Encounter.prototype = {
+RudeDudesGame.Encounter = function(){};
+RudeDudesGame.Encounter.prototype = {
   create: function() {
-    var graphics = this.game.add.graphics(100,100);
-      // set a fill and line style
-    graphics.beginFill(0xFF3300);
-    graphics.lineStyle(10, 0xffd900, 1);
+    var graphics = this.game.add.graphics(0,0);
     
-    // draw a shape
-    graphics.moveTo(50,50);
-    graphics.lineTo(250, 50);
-    graphics.lineTo(100, 100);
-    graphics.lineTo(250, 220);
-    graphics.lineTo(50, 220);
-    graphics.lineTo(50, 50);
-    graphics.endFill();
+    console.log(RUDEDUDES);
     
-    // set a fill and line style again
-    graphics.lineStyle(10, 0xFF0000, 0.8);
-    graphics.beginFill(0xFF700B, 1);
+    var stats1 = new RUDEDUDES.stats(100,3,4,5);
+    var dudeList = new RUDEDUDES.dudeList();
+    var moveList = new RUDEDUDES.moveList(RUDEDUDES);
     
-    // draw a second shape
-    graphics.moveTo(210,300);
-    graphics.lineTo(450,320);
-    graphics.lineTo(570,350);
-    graphics.quadraticCurveTo(600, 0, 480,100);
-    graphics.lineTo(330,120);
-    graphics.lineTo(410,200);
-    graphics.lineTo(210,300);
-    graphics.endFill();
-    
-    // draw a rectangle
-    graphics.lineStyle(2, 0x0000FF, 1);
-    graphics.drawRect(50, 250, 100, 100);
-    
-    // draw a circle
-    graphics.lineStyle(0);
-    graphics.beginFill(0xFFFF0B, 0.5);
-    graphics.drawCircle(470, 200, 200);
-    graphics.endFill();
+    var config1 = {
+      dudeID: 0,
+      dudeStats: stats1,
+      dudeDefaultStats: stats1,
+      moves: {
+        passive: -1,
+        ability1: 0,
+        ability2: -1,
+        ability3: -1,
+        ult: -2
+      }
+    };
+    var config1b = {
+      dudeID: 2,
+      dudeStats:  new RUDEDUDES.stats(10,3,4,5),
+      dudeDefaultStats:  new RUDEDUDES.stats(100,3,4,5),
+      moves: {
+        passive: -1,
+        ability1: 1,
+        ability2: -1,
+        ability3: -1,
+        ult: -2
+      }
+    };
+    var duder1 = new RUDEDUDES.dude(config1, dudeList, moveList);
+    var duder1b = new RUDEDUDES.dude(config1b, dudeList, moveList);
+    var player1 = new RUDEDUDES.player([duder1b,duder1]);
 
-    graphics.lineStyle(20, 0x33FF00);
-    graphics.moveTo(30,30);
-    graphics.lineTo(600, 300);
+    var stats2 = new RUDEDUDES.stats(100,4,3,2);
+    var config2 = {
+      dudeID: 1,
+      dudeStats: stats2,
+      dudeDefaultStats: stats2,
+      moves: {
+        passive: -1,
+        ability1: 1,
+        ability2: -1,
+        ability3: -1,
+        ult: -2
+      }
+    };
+    var duder2 = new RUDEDUDES.dude(config2, dudeList, moveList);
+    var player2 = new RUDEDUDES.player([duder2]);
+    
+    var encounter = new RUDEDUDES.encounter(player1, player2);
+    var cnv = new RUDEDUDES.encounterCanvas(640, 360);
+    cnv.drawHUD(this, encounter,RUDEDUDES);
+   /* window.setInterval(function(){
+      cnv.drawHUD(encounter,RUDEDUDES);
+    }, 1000);     */
 
   },
   update: function() {
