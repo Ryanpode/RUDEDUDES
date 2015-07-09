@@ -148,6 +148,7 @@ var RUDEDUDES = (function (my, $) {
 				}
 			}
 			console.log(encounter.enemyDude.stats);
+			my.encounterCanvas(640,360).drawHUD(RudeDudesGame,encounter,my);
 		};
 		return this;
 	};
@@ -166,19 +167,20 @@ var RUDEDUDES = (function (my, $) {
 		console.log('encounterCanvas init');
 		var encounterCanvas = this;
 
-		encounterCanvas.width = width;
+		encounterCanvas.width = width;34
 		encounterCanvas.height = height;
 		
 		encounterCanvas.drawHUD = function(RudeDudesGame, encounter, RUDEDUDES) {
 			//encounterCanvas.layers.HUD.removeChildren();
 			encounterCanvas.drawMoveButtons(RudeDudesGame, encounter, RUDEDUDES);
+			encounterCanvas.drawTopHUD(RudeDudesGame, encounter, RUDEDUDES);
 			//encounterCanvas.drawTopHUD(RudeDudesGame, encounter, RUDEDUDES);
 		};
 		encounterCanvas.drawTopHUD = function(RudeDudesGame, encounter, RUDEDUDES) {
 			var canvas = encounterCanvas;
 
 			var canvasWidth = encounterCanvas.width;
-			var canvasHeight = encounterCanvas.width;
+			var canvasHeight = encounterCanvas.height;
 			var textPaddingRatio = .02
 			var xPaddingRatio = .05;
 			var yPaddingRatio = .05;
@@ -192,69 +194,37 @@ var RUDEDUDES = (function (my, $) {
 			var width = xRatio * canvasWidth;
 			var widthMyHP = canvasWidth * xRatio * (encounter.myDude.stats.HP / encounter.myDude.defaultStats.HP);
 			var widthEnemyHP = canvasWidth * xRatio * (encounter.enemyDude.stats.HP / encounter.enemyDude.defaultStats.HP);
+			var fontSize = canvasHeight * .04;
 			
 			//create my dude
-			var rectMyBox = new Kinetic.Rect({
-				x: xMyTotal,
-				y: y,
-				width: width,
-				height: height,
-				stroke: 'black',
-				strokewidth: 1,
-			});
-			var rectMyHP = new Kinetic.Rect({
-				x: xMyTotal,
-				y: y,
-				width: widthMyHP,
-				height: height,
-				fill: 'black',
-				fill: 'green'
-			});
-			var textMyDude = new Kinetic.Text({
-				x: xMyTotal,
-				y: yText,
-				width: width,
-				height: height,
-				align: 'left',
-				fill: 'black',
-				text: encounter.myDude.dudeInfo.name
-			});
-			canvas.layers.HUD.add(rectMyBox);
-			canvas.layers.HUD.add(rectMyHP);
-			canvas.layers.HUD.add(textMyDude);
+			var drawHP = function(x,y,width,height,widthHP){
+				var sprite = RudeDudesGame.game.add.sprite(x,y);
+			    var graphics = RudeDudesGame.game.add.graphics(0,0);
+
+			    console.log(x,y,width,height,widthHP);
+
+			    graphics.beginFill(0x008800);
+			    graphics.lineStyle(0,0,0);
+			    graphics.drawRect(0,0,widthHP,height);
+
+			    graphics.beginFill(0,0);
+			    graphics.lineStyle(1, 'black', 1);
+			    graphics.drawRect(0,0,width,height);
+
+				sprite.addChild(graphics);
+			};
+			drawHP(xMyTotal,y,width,height,widthMyHP);
+			drawHP(xEnemyTotal,y,width,height,widthEnemyHP);
 			
-			//create enemy dude
-			var rectEnemyBox = new Kinetic.Rect({
-				x: xEnemyTotal,
-				y: y,
-				width: width,
-				height: height,
-				stroke: 'black',
-				strokewidth: 1,
-			});
-			var rectEnemyHP = new Kinetic.Rect({
-				x: xEnemyTotal,
-				y: y,
-				width: widthEnemyHP,
-				height: height,
-				fill: 'green'
-			});
-			var textEnemyDude = new Kinetic.Text({
-				x: xEnemyTotal,
-				y: yText,
-				width: width,
-				height: height,
-				align: 'right',
-				fill: 'black',
-				text: encounter.enemyDude.dudeInfo.name
-			});
-			canvas.layers.HUD.add(rectEnemyBox);
-			canvas.layers.HUD.add(rectEnemyHP);
-			canvas.layers.HUD.add(textEnemyDude);
-			
-			//draw it :) 
-			canvas.layers.HUD.draw();
-			
+			var myTextSprite = RudeDudesGame.game.add.sprite(xMyTotal,yText);
+		    var myText = RudeDudesGame.game.add.text(0,0,encounter.myDude.dudeInfo.name,{'fontSize':fontSize});
+			myTextSprite.addChild(myText);
+
+			var enemyTextSprite = RudeDudesGame.game.add.sprite(xEnemyTotal,yText);
+		    var enemyText = RudeDudesGame.game.add.text(0,0,encounter.enemyDude.dudeInfo.name,{'fontSize':fontSize});
+		    enemyText.x = width - enemyText.width;
+			enemyTextSprite.addChild(enemyText);
+		    			
 		};
 		
 		this.drawMoveButtons = function(RudeDudesGame, encounter, RUDEDUDES) {
@@ -280,45 +250,21 @@ var RUDEDUDES = (function (my, $) {
 
 				var sprite = RudeDudesGame.game.add.sprite(x,y);
 			    var graphics = RudeDudesGame.game.add.graphics(0,0);
-			    var text = RudeDudesGame.game.add.text(0,sideLength / 2,text,{'fontSize':fontSize,'align':'center','width':sideLength});
-
+			    var text = RudeDudesGame.game.add.text(sideLength/2,sideLength/2,text,{'fontSize':fontSize,'align':'center','width':sideLength});
+			    text.anchor.x = Math.round(text.width * 0.5) / text.width;
+			    text.anchor.y = Math.round(text.height * 0.5) / text.height;
 
 			      // set a fill and line style
 			    graphics.beginFill(color);
 			    graphics.lineStyle(1, 'black', 1);
-
 			    graphics.drawRect(0,0,sideLength,sideLength);
 			    
-			    // draw a shape
-				var btn = new Kinetic.Rect({
-					x: x,
-					y: y,
-					width: sideLength,
-					height: sideLength,
-					stroke: 'black',
-					strokewidth: 1,
-					fill: color
-				});
-				
 				sprite.addChild(graphics);
 				sprite.addChild(text);
 
 				sprite.inputEnabled = true;
-				sprite.events.onInputDown.add(function(){console.log(moveEffect)}, this);
+				sprite.events.onInputDown.add(function(){moveEffect()}, this);
 /**/
-				//btn.on('click', moveEffect);
-				
-			/*	canvas.layers.HUD.add(btn);
-				canvas.layers.HUD.add(new Kinetic.Text({
-					x: x,
-					y: y  + sideLength / 2 - fontSize / 2,
-					text: text,
-					align: 'center',
-					width: sideLength,
-					fontSize: fontSize,
-					fill: 'black'
-				}));
-				canvas.layers.HUD.draw();*/
 			};
 			
 			drawButton((3/16),.125,'(Passive)',encounter.myDude.moves.passive,encounter,this);

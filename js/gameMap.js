@@ -183,7 +183,7 @@ RudeDudesGame.Encounter.prototype = {
     };
     var config1b = {
       dudeID: 2,
-      dudeStats:  new RUDEDUDES.stats(10,3,4,5),
+      dudeStats:  new RUDEDUDES.stats(50,3,4,5),
       dudeDefaultStats:  new RUDEDUDES.stats(100,3,4,5),
       moves: {
         passive: -1,
