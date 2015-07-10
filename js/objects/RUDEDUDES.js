@@ -109,7 +109,7 @@ var RUDEDUDES = (function (my, $) {
 
 		return move;
 	},
-	my.moveEffects = function(RUDEDUDES){
+	my.moveEffects = function(){
 		this.getTypeMultiplier = function(attackType, dudeType) {
 			switch (attackType) {
 				case 'Water':
@@ -169,16 +169,19 @@ var RUDEDUDES = (function (my, $) {
 
 		encounterCanvas.width = width;34
 		encounterCanvas.height = height;
+
+		encounterCanvas.graphicsHP = RudeDudesGame.game.add.graphics(0,0,encounterCanvas.HUD);
 		
 		encounterCanvas.drawHUD = function(RudeDudesGame, encounter, RUDEDUDES) {
+			encounterCanvas.graphicsHP.clear();
+
 			//encounterCanvas.layers.HUD.removeChildren();
 			encounterCanvas.drawMoveButtons(RudeDudesGame, encounter, RUDEDUDES);
 			encounterCanvas.drawTopHUD(RudeDudesGame, encounter, RUDEDUDES);
 			//encounterCanvas.drawTopHUD(RudeDudesGame, encounter, RUDEDUDES);
 		};
 		encounterCanvas.drawTopHUD = function(RudeDudesGame, encounter, RUDEDUDES) {
-			var canvas = encounterCanvas;
-
+			
 			var canvasWidth = encounterCanvas.width;
 			var canvasHeight = encounterCanvas.height;
 			var textPaddingRatio = .02
@@ -197,39 +200,31 @@ var RUDEDUDES = (function (my, $) {
 			var fontSize = canvasHeight * .04;
 			
 			//create my dude
-			var drawHP = function(x,y,width,height,widthHP){
-				var sprite = RudeDudesGame.game.add.sprite(x,y);
-			    var graphics = RudeDudesGame.game.add.graphics(0,0);
+			var drawHP = function(x,y,width,height,widthHP,graphics){
 
-			    console.log(x,y,width,height,widthHP);
+			    console.log(graphics);
 
 			    graphics.beginFill(0x008800);
 			    graphics.lineStyle(0,0,0);
-			    graphics.drawRect(0,0,widthHP,height);
+			    graphics.drawRect(x,y,widthHP,height);
 
 			    graphics.beginFill(0,0);
 			    graphics.lineStyle(1, 'black', 1);
-			    graphics.drawRect(0,0,width,height);
+			    graphics.drawRect(x,y,width,height);
 
-				sprite.addChild(graphics);
 			};
-			drawHP(xMyTotal,y,width,height,widthMyHP);
-			drawHP(xEnemyTotal,y,width,height,widthEnemyHP);
+			drawHP(xMyTotal,y,width,height,widthMyHP,encounterCanvas.graphicsHP);
+			drawHP(xEnemyTotal,y,width,height,widthEnemyHP,encounterCanvas.graphicsHP);
 			
-			var myTextSprite = RudeDudesGame.game.add.sprite(xMyTotal,yText);
-		    var myText = RudeDudesGame.game.add.text(0,0,encounter.myDude.dudeInfo.name,{'fontSize':fontSize});
-			myTextSprite.addChild(myText);
-
-			var enemyTextSprite = RudeDudesGame.game.add.sprite(xEnemyTotal,yText);
-		    var enemyText = RudeDudesGame.game.add.text(0,0,encounter.enemyDude.dudeInfo.name,{'fontSize':fontSize});
-		    enemyText.x = width - enemyText.width;
-			enemyTextSprite.addChild(enemyText);
+		    var myText = RudeDudesGame.game.add.text(xMyTotal,yText,encounter.myDude.dudeInfo.name,{'fontSize':fontSize});
+		    var enemyText = RudeDudesGame.game.add.text(xEnemyTotal + width,yText,encounter.enemyDude.dudeInfo.name,{'fontSize':fontSize});
+		    enemyText.x -= enemyText.width;
 		    			
 		};
 		
 		this.drawMoveButtons = function(RudeDudesGame, encounter, RUDEDUDES) {
 			
-			var moveEffects = new RUDEDUDES.moveEffects(RUDEDUDES);
+			var moveEffects = new my.moveEffects();
 			var drawButton = function(xRatio,sideRatio,defaultText,move,encounter,canvas){
 				
 				var color = 0x888888;
