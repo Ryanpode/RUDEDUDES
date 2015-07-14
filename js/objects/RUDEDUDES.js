@@ -148,7 +148,6 @@ var RUDEDUDES = (function (my, $) {
 				}
 			}
 			console.log(encounter.enemyDude.stats);
-			my.encounterCanvas(640,360).drawHUD(RudeDudesGame,encounter,my);
 		};
 		return this;
 	};

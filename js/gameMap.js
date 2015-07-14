@@ -212,13 +212,16 @@ RudeDudesGame.Encounter.prototype = {
     };
     var duder2 = new RUDEDUDES.dude(config2, dudeList, moveList);
     var player2 = new RUDEDUDES.player([duder2]);
-    
-    encounter = new RUDEDUDES.encounter(player1, player2);
-    var encounterCanvas = {};
+
+    this.encounter = new RUDEDUDES.encounter(player1, player2);
+    encounterCanvas = {};
 
     encounterCanvas.width = 640;
     encounterCanvas.height = 320;
-    encounterCanvas.graphicsHP = RudeDudesGame.game.add.graphics(0,0,encounterCanvas.HUD);
+    encounterCanvas.graphicsStaticHUD = RudeDudesGame.game.add.graphics(0,0,encounterCanvas.HUD);
+
+    encounterCanvas.graphicsMyHP = RudeDudesGame.game.add.graphics();
+    encounterCanvas.graphicsEnemyHP = RudeDudesGame.game.add.graphics();
 
     encounterCanvas.drawTopHUD = function(RudeDudesGame, encounter) {
       
@@ -235,30 +238,44 @@ RudeDudesGame.Encounter.prototype = {
       var height = canvasHeight * yRatio;
       var yText = y + canvasHeight * textPaddingRatio + height
       var width = xRatio * canvasWidth;
-      var widthMyHP = canvasWidth * xRatio * (encounter.myDude.stats.HP / encounter.myDude.defaultStats.HP);
-      var widthEnemyHP = canvasWidth * xRatio * (encounter.enemyDude.stats.HP / encounter.enemyDude.defaultStats.HP);
       var fontSize = canvasHeight * .04;
-      
-      //create my dude
-      var drawHP = function(x,y,width,height,widthHP,graphics){
 
-          console.log(graphics);
-
-          graphics.beginFill(0x008800);
-          graphics.lineStyle(0,0,0);
-          graphics.drawRect(x,y,widthHP,height);
-
-          graphics.beginFill(0,0);
-          graphics.lineStyle(1, 'black', 1);
-          graphics.drawRect(x,y,width,height);
-
+      encounter.getHPWidth = function(HPRatio){
+        return canvasWidth * xRatio * HPRatio;
       };
-      drawHP(xMyTotal,y,width,height,widthMyHP,encounterCanvas.graphicsHP);
-      drawHP(xEnemyTotal,y,width,height,widthEnemyHP,encounterCanvas.graphicsHP);
+
+       encounterCanvas.updateHP = function(encounter) {
+
+        var widthMyHP = canvasWidth * xRatio * (encounter.myDude.stats.HP / encounter.myDude.defaultStats.HP);
+        var widthEnemyHP = canvasWidth * xRatio * (encounter.enemyDude.stats.HP / encounter.enemyDude.defaultStats.HP);
       
-        var myText = RudeDudesGame.game.add.text(xMyTotal,yText,encounter.myDude.dudeInfo.name,{'fontSize':fontSize});
-        var enemyText = RudeDudesGame.game.add.text(xEnemyTotal + width,yText,encounter.enemyDude.dudeInfo.name,{'fontSize':fontSize});
-        enemyText.x -= enemyText.width;
+        var drawHP = function(x,y,width,height,widthHP,graphics) {
+            graphics.clear();
+            
+            graphics.beginFill(0x008800);
+            graphics.lineStyle(0,0,0);
+            graphics.drawRect(x,y,widthHP,height);
+        };
+
+        var drawHPBar = function(x,y,width,height,widthHP,graphics){
+
+            drawHP(x,y,width,height,widthHP,graphics);
+
+            encounterCanvas.graphicsStaticHUD.beginFill(0,0);
+            encounterCanvas.graphicsStaticHUD.lineStyle(1, 'black', 1);
+            encounterCanvas.graphicsStaticHUD.drawRect(x,y,width,height);
+
+        };
+        drawHPBar(xMyTotal,y,width,height,widthMyHP,encounterCanvas.graphicsMyHP);
+        drawHPBar(xEnemyTotal,y,width,height,widthEnemyHP,encounterCanvas.graphicsEnemyHP);
+        
+      };
+
+      encounterCanvas.updateHP(encounter);
+
+      var myText = RudeDudesGame.game.add.text(xMyTotal,yText,encounter.myDude.dudeInfo.name,{'fontSize':fontSize});
+      var enemyText = RudeDudesGame.game.add.text(xEnemyTotal + width,yText,encounter.enemyDude.dudeInfo.name,{'fontSize':fontSize});
+      enemyText.x -= enemyText.width;
               
     };
     encounterCanvas.drawMoveButtons = function(RudeDudesGame, encounter) {
@@ -308,14 +325,16 @@ RudeDudesGame.Encounter.prototype = {
     };
 
     encounterCanvas.drawHUD = function(RudeDudesGame, encounter) {
-      encounterCanvas.graphicsHP.clear();
+      encounterCanvas.graphicsStaticHUD.clear();
 
       //encounterCanvas.layers.HUD.removeChildren();
       encounterCanvas.drawMoveButtons(RudeDudesGame, encounter);
       encounterCanvas.drawTopHUD(RudeDudesGame, encounter);
       //encounterCanvas.drawTopHUD(RudeDudesGame, encounter, RUDEDUDES);
     };
-    encounterCanvas.drawHUD(this,encounter);
+    encounterCanvas.drawHUD(this,this.encounter);
+    this.encounter.encounterCanvas = encounterCanvas;
+
     /*var cnv = new RUDEDUDES.encounterCanvas(640, 360);
     cnv.drawHUD(this, encounter,RUDEDUDES);
     window.setInterval(function(){
@@ -324,6 +343,7 @@ RudeDudesGame.Encounter.prototype = {
 
   },
   update: function() {
-    
+    //console.log(this);
+    this.encounter.encounterCanvas.updateHP(this.encounter);
   }
 }
