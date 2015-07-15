@@ -274,6 +274,10 @@ RudeDudesGame.Encounter.prototype = {
       enemyText.x -= enemyText.width;
               
     };
+    canvas.displayMoveText = function(encounter) {
+      var myDudeName = encounter.myDude.dudeInfo.name;
+
+    };
     canvas.drawMoveButtons = function(encounter) {
       var moveEffects = RUDEDUDES.moveEffects;
       var drawButton = function(xRatio,sideRatio,defaultText,move){
@@ -346,7 +350,6 @@ RudeDudesGame.Encounter.prototype = {
       this.encounter.canvas.updateHP(this.encounter);
       this.encounter.enemyDude.moveComplete = false;
       this.encounter.myTurn = true;
-      //console.log(this.encounter);
     }
   }
 }

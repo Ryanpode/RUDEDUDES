@@ -40,6 +40,13 @@ var RUDEDUDES = (function (my, $) {
 			ult: moveList.getMove(dudeConfig.moves.ult)
 		};
 
+		dude.moveResults = {};
+		dude.setMoveResults = function(move,damage,effects){
+			dude.moveResults.move = move;
+			dude.moveResults.damage = damage;
+			dude.moveResults.effects = effects;
+		};
+
 		return dude;
 	};
 	my.stats = function(HP, Atk, Def, Spd){
@@ -87,7 +94,16 @@ var RUDEDUDES = (function (my, $) {
 		move.moveEffects = moveEffects;
 
 		return move;
-	},
+	};
+	my.moveResults = function(move){
+		var moveResults = this;
+
+		moveResults.move = move;
+		moveResults.damage = 0;
+		moveResults.notes = [];
+
+		return moveResults;
+	};
 	my.moveEffects = function(){
 		this.getTypeMultiplier = function(attackType, dudeType) {
 			switch (attackType) {
@@ -113,18 +129,25 @@ var RUDEDUDES = (function (my, $) {
 			var typeMultiplier = this.getTypeMultiplier(targetDude.dudeInfo.type, move.moveType);
 			var bonusMultiplier = attackingDude.stats.Atk / targetDude.stats.Def;
 			var base = move.moveBase;
-			var newHP = targetDude.stats.HP - base * typeMultiplier * bonusMultiplier
+			var damage =  base * typeMultiplier * bonusMultiplier;
+			var newHP = targetDude.stats.HP - damage;
 			targetDude.stats.HP = Math.max(newHP,0);
+			return damage;
 		};
 		this.useMove = function(move, attackingDude, targetDude, encounter) {
 			var dudeEffects = move.moveEffects;
+
+			//do call each of the proper effect functions and log results in myResults object
+			var myResults = new my.moveResults(move);
 			for (i = 0; i < dudeEffects.length; i++) {
 				switch(dudeEffects[i]) {
 					case 'damageTarget':
-						this.dealDamage(move, attackingDude, targetDude, encounter)
+						//deal damage and save the amount
+						myResults.damage += this.dealDamage(move, attackingDude, targetDude, encounter);
 						break;
 				}
 			}
+			attackingDude.moveResults = myResults;
 			attackingDude.moveComplete = true;
 		};
 		return this;
@@ -151,7 +174,11 @@ var RUDEDUDES = (function (my, $) {
 
 		//game will check this to update HUD
 		encounter.myDude.moveComplete = false;
+		encounter.myDude.moveResults = {};
+
 		encounter.enemyDude.moveComplete = false;
+		encounter.enemyDude.moveResults = {};
+
 		encounter.myTurn = true;
 
 		encounter.getEnemyMove = function() {
@@ -159,13 +186,7 @@ var RUDEDUDES = (function (my, $) {
 		};
 
 		encounter.useEnemyMove = function() {
-			console.log(encounter.getEnemyMove());
-			console.log(encounter.enemyDude);
-			console.log(encounter.myDude);
-			console.log(encounter);
-			var me = my.moveEffects;
-			console.log(me);
-			me.useMove(encounter.getEnemyMove(), encounter.enemyDude, encounter.myDude, encounter);
+			my.moveEffects.useMove(encounter.getEnemyMove(), encounter.enemyDude, encounter.myDude, encounter);
 		};
 
 		encounter.compareSpeed = function() {
