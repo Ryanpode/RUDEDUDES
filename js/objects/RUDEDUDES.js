@@ -1,41 +1,4 @@
 var RUDEDUDES = (function (my, $) {
-	my.encounter = function(myPlayer, enemyPlayer){
-		var encounter = this;
-
-		encounter.myPlayer = myPlayer;
-		encounter.enemyPlayer = enemyPlayer;
-
-		encounter.myDude = myPlayer.getStartingDude();
-		encounter.enemyDude = enemyPlayer.getStartingDude();
-
-		//game will check this to update HUD
-		encounter.myDude.moveComplete = false;
-		encounter.enemyDude.moveComplete = false;
-		encounter.myTurn = true;
-
-		encounter.getEnemyMove = function() {
-			return encounter.enemyDude.moves.ability1;
-		};
-
-		encounter.useEnemyMove = function() {
-			console.log(encounter.getEnemyMove());
-			console.log( encounter.enemyDude);
-			console.log(encounter.myDude);
-			console.log(encounter);
-			my.moveEffects.useMove(encounter.getEnemyMove(), encounter.enemyDude, encounter.myDude, encounter);
-		};
-
-		encounter.compareSpeed = function() {
-			//get the effective speed, taking stats, status, and abilities into consideration
-			var getEffectiveSpeed = function(dude) {
-				return dude.stats.Spd;
-			};
-			
-			return getEffectiveSpeed(myDude) - getEffectiveSpeed(enemyDude);
-		};
-		
-		return encounter;
-	};
 	my.player = function(dudes){
 		var player = this;
 
@@ -130,21 +93,22 @@ var RUDEDUDES = (function (my, $) {
 			switch (attackType) {
 				case 'Water':
 					switch(dudeType) {
-						case 'Water':
-							return 1
 						case 'Fire':
-							return .5
+							return .5;
+						default:
+							return 1;
 					}
 				case 'Fire':
 					switch(dudeType) {
 						case 'Water':
-							return 2
-						case 'Fire':
-							return 1
+							return 2;
+						default:
+							return 1;
 					}
+				default:
+					return 1;
 			}
-		};
-				
+		};				
 		this.dealDamage = function(move, attackingDude, targetDude, encounter) {
 			var typeMultiplier = this.getTypeMultiplier(targetDude.dudeInfo.type, move.moveType);
 			var bonusMultiplier = attackingDude.stats.Atk / targetDude.stats.Def;
@@ -152,7 +116,6 @@ var RUDEDUDES = (function (my, $) {
 			var newHP = targetDude.stats.HP - base * typeMultiplier * bonusMultiplier
 			targetDude.stats.HP = Math.max(newHP,0);
 		};
-		
 		this.useMove = function(move, attackingDude, targetDude, encounter) {
 			var dudeEffects = move.moveEffects;
 			for (i = 0; i < dudeEffects.length; i++) {
@@ -163,14 +126,13 @@ var RUDEDUDES = (function (my, $) {
 				}
 			}
 			attackingDude.moveComplete = true;
-			//console.log(encounter.enemyDude.stats);
 		};
 		return this;
-	};
-	my.moveList = function(RUDEDUDES){
+	}(my.moveEffects || {});
+	my.moveList = function(){
 		var moves = [
-			new RUDEDUDES.move('Watershot', 'Water', 'AtWill', '2', 'Shoots water', ['damageTarget']),
-			new RUDEDUDES.move('Firestick', 'Fire', 'AtWill', '2', 'Hit him with a firestick', ['damageTarget'])
+			new my.move('Watershot', 'Water', 'AtWill', '2', 'Shoots water', ['damageTarget']),
+			new my.move('Firestick', 'Fire', 'AtWill', '2', 'Hit him with a firestick', ['damageTarget'])
 		];
 		var getMove = function(index){return moves[index];}
 		return  {
@@ -178,7 +140,45 @@ var RUDEDUDES = (function (my, $) {
 			getMove: getMove
 		}
 	};
-	
+	my.encounter = function(myPlayer, enemyPlayer){
+		var encounter = this;
+
+		encounter.myPlayer = myPlayer;
+		encounter.enemyPlayer = enemyPlayer;
+
+		encounter.myDude = myPlayer.getStartingDude();
+		encounter.enemyDude = enemyPlayer.getStartingDude();
+
+		//game will check this to update HUD
+		encounter.myDude.moveComplete = false;
+		encounter.enemyDude.moveComplete = false;
+		encounter.myTurn = true;
+
+		encounter.getEnemyMove = function() {
+			return encounter.enemyDude.moves.ability1;
+		};
+
+		encounter.useEnemyMove = function() {
+			console.log(encounter.getEnemyMove());
+			console.log(encounter.enemyDude);
+			console.log(encounter.myDude);
+			console.log(encounter);
+			var me = my.moveEffects;
+			console.log(me);
+			me.useMove(encounter.getEnemyMove(), encounter.enemyDude, encounter.myDude, encounter);
+		};
+
+		encounter.compareSpeed = function() {
+			//get the effective speed, taking stats, status, and abilities into consideration
+			var getEffectiveSpeed = function(dude) {
+				return dude.stats.Spd;
+			};
+			
+			return getEffectiveSpeed(myDude) - getEffectiveSpeed(enemyDude);
+		};
+		
+		return encounter;
+	};
 	
 	return my;
 }(RUDEDUDES || {}, jQuery));

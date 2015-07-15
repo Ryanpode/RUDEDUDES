@@ -114,7 +114,6 @@ RudeDudesGame.Game.prototype = {
   },
   //create a sprite from an object
   createFromTiledObject: function(element, group) {
-    console.log(element);
     var sprite = group.create(element.x, element.y, element.properties.sprite);
 
       //copy all properties to the sprite
@@ -151,9 +150,7 @@ RudeDudesGame.Game.prototype = {
     collectable.destroy();
   },
   enterGrass: function(player, door) {
-    console.log(player);
-    console.log(door);
-    console.log('IN THE GRASS!');
+    
     this.state.start('Encounter');
   }
 };
@@ -195,7 +192,7 @@ RudeDudesGame.Encounter.prototype = {
     };
     var duder1 = new RUDEDUDES.dude(config1, dudeList, moveList);
     var duder1b = new RUDEDUDES.dude(config1b, dudeList, moveList);
-    var player1 = new RUDEDUDES.player([duder1b,duder1]);
+    var player1 = new RUDEDUDES.player([duder1,duder1b]);
 
     var stats2 = new RUDEDUDES.stats(100,4,3,2);
     var config2 = {
@@ -278,7 +275,7 @@ RudeDudesGame.Encounter.prototype = {
               
     };
     canvas.drawMoveButtons = function(encounter) {
-      var moveEffects = new RUDEDUDES.moveEffects();
+      var moveEffects = RUDEDUDES.moveEffects;
       var drawButton = function(xRatio,sideRatio,defaultText,move){
         
         var color = 0x888888;
@@ -342,7 +339,7 @@ RudeDudesGame.Encounter.prototype = {
       this.encounter.canvas.updateHP(this.encounter);
       this.encounter.myDude.moveComplete = false;
       this.encounter.myTurn = false;
-     // this.encounter.useEnemyMove();
+      this.encounter.useEnemyMove();
     }
 
     if (this.encounter.enemyDude.moveComplete) {
