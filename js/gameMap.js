@@ -1,3 +1,37 @@
+//define some globals for testing
+var stats1 = new RUDEDUDES.stats(100,3,4,5);
+    var dudeList = new RUDEDUDES.dudeList();
+    var moveList = new RUDEDUDES.moveList(RUDEDUDES);
+    
+    var config1 = {
+      dudeID: 0,
+      dudeStats: stats1,
+      dudeDefaultStats: stats1,
+      moves: {
+        passive: -1,
+        ability1: 0,
+        ability2: -1,
+        ability3: -1,
+        ult: -2
+      }
+    };
+    var config1b = {
+      dudeID: 2,
+      dudeStats:  new RUDEDUDES.stats(50,3,4,5),
+      dudeDefaultStats:  new RUDEDUDES.stats(100,3,4,5),
+      moves: {
+        passive: -1,
+        ability1: 1,
+        ability2: -1,
+        ability3: -1,
+        ult: -2
+      }
+    };
+    var duder1 = new RUDEDUDES.dude(config1, dudeList, moveList);
+    var duder1b = new RUDEDUDES.dude(config1b, dudeList, moveList);
+    var player1 = new RUDEDUDES.player([duder1,duder1b]);
+
+
 
 var RudeDudesGame = RudeDudesGame || {};
 RudeDudesGame.Boot = function(){};
@@ -158,41 +192,7 @@ RudeDudesGame.Game.prototype = {
 RudeDudesGame.Encounter = function(){};
 RudeDudesGame.Encounter.prototype = {
   create: function() {
-    var graphics = this.game.add.graphics(0,0);
-    
-    //console.log(RUDEDUDES);
-    
-    var stats1 = new RUDEDUDES.stats(100,3,4,5);
-    var dudeList = new RUDEDUDES.dudeList();
-    var moveList = new RUDEDUDES.moveList(RUDEDUDES);
-    
-    var config1 = {
-      dudeID: 0,
-      dudeStats: stats1,
-      dudeDefaultStats: stats1,
-      moves: {
-        passive: -1,
-        ability1: 0,
-        ability2: -1,
-        ability3: -1,
-        ult: -2
-      }
-    };
-    var config1b = {
-      dudeID: 2,
-      dudeStats:  new RUDEDUDES.stats(50,3,4,5),
-      dudeDefaultStats:  new RUDEDUDES.stats(100,3,4,5),
-      moves: {
-        passive: -1,
-        ability1: 1,
-        ability2: -1,
-        ability3: -1,
-        ult: -2
-      }
-    };
-    var duder1 = new RUDEDUDES.dude(config1, dudeList, moveList);
-    var duder1b = new RUDEDUDES.dude(config1b, dudeList, moveList);
-    var player1 = new RUDEDUDES.player([duder1,duder1b]);
+
 
     var stats2 = new RUDEDUDES.stats(100,4,3,2);
     var config2 = {
@@ -210,6 +210,8 @@ RudeDudesGame.Encounter.prototype = {
     var duder2 = new RUDEDUDES.dude(config2, dudeList, moveList);
     var player2 = new RUDEDUDES.player([duder2]);
 
+
+    var graphics = this.game.add.graphics(0,0);
     this.encounter = new RUDEDUDES.encounter(player1, player2);
     
     //DRAWING STARTS HERE 
@@ -243,7 +245,11 @@ RudeDudesGame.Encounter.prototype = {
     var height = canvasHeight * yRatio;
     var yText = y + canvasHeight * textPaddingRatio + height
     var width = xRatio * canvasWidth;
-    var fontSize = canvasHeight * .04;
+    var moveSideLength = canvas.width * .125;
+    var nameFontSize = canvasHeight * .04;
+    var moveFontSize = canvasHeight * .04;
+    var eventFontSize = canvasHeight * .03;
+    var endingFontSize = canvasHeight * .1;
 
     canvas.drawTopHUD = function(encounter) {
       
@@ -277,41 +283,50 @@ RudeDudesGame.Encounter.prototype = {
 
       canvas.updateHP(encounter);
 
-      var myText = RudeDudesGame.game.add.text(xMyTotal,yText,encounter.myDude.dudeInfo.name,{'fontSize':fontSize});
-      var enemyText = RudeDudesGame.game.add.text(xEnemyTotal + width,yText,encounter.enemyDude.dudeInfo.name,{'fontSize':fontSize});
+      var myText = RudeDudesGame.game.add.text(xMyTotal,yText,encounter.myDude.dudeInfo.name,{'fontSize':nameFontSize});
+      var enemyText = RudeDudesGame.game.add.text(xEnemyTotal + width,yText,encounter.enemyDude.dudeInfo.name,{'fontSize':nameFontSize});
       enemyText.x -= enemyText.width;
               
     };
+
     canvas.displayMyMoveText = function(encounter) {
       var myDudeName = encounter.myDude.dudeInfo.name;
       var moveResults = encounter.myDude.moveResults;
       var moveText = myDudeName + " used " + moveResults.move.moveName;
-      var text = RudeDudesGame.game.add.text(50,100,moveText,{'fontSize':fontSize});
+      var text = RudeDudesGame.game.add.text(50,100,moveText,{'fontSize':eventFontSize});
       RudeDudesGame.game.time.events.add(1000, function() {
         text.destroy();
       }, this);
 
-      console.log(moveText);
-
     };
+
     canvas.displayEnemyMoveText = function(encounter) {
       var enemyDudeName = encounter.enemyDude.dudeInfo.name;
       var moveResults = encounter.enemyDude.moveResults;
       var moveText = enemyDudeName + " used " + moveResults.move.moveName;
-      var text = RudeDudesGame.game.add.text(570,100,moveText,{'fontSize':fontSize});
+      var text = RudeDudesGame.game.add.text(570,100,moveText,{'fontSize':eventFontSize});
       text.x -= text.width
       RudeDudesGame.game.time.events.add(1000, function() {
         text.destroy();
       }, this);
 
-      console.log(moveText);
-
     };
 
+    canvas.displayEndingText = function(encounter) {
+      var enemyDudeName = encounter.enemyDude.dudeInfo.name;
+      var endingText = encounter.enemyDude.dudeInfo.name + " has DIED!";
+      var text = RudeDudesGame.game.add.text(320,100,endingText,{'fontSize':endingFontSize});
+      text.x -= text.width / 2;
+      RudeDudesGame.game.time.events.add(1000, function() {
+        text.destroy();
+        console.log(RudeDudesGame);
+        RudeDudesGame.game.state.start('Game');
+      }, this);
+    };
 
     canvas.drawMoveButtons = function(encounter) {
       var moveEffects = RUDEDUDES.moveEffects;
-      var drawButton = function(xRatio,sideRatio,defaultText,move){
+      var drawButton = function(xRatio,defaultText,move){
         
         var color = 0x888888;
         var text = defaultText;
@@ -323,22 +338,20 @@ RudeDudesGame.Encounter.prototype = {
           moveEffect = function(){moveEffects.useMove(move, encounter.myDude, encounter.enemyDude, encounter)};
         };
         
-        var sideLength = canvas.width * sideRatio;
         var x = canvas.width * xRatio;
-        var y = canvas.height - sideLength;
-        var fontSize = sideLength * .15;
-        var yText = y  + sideLength / 2 - fontSize / 2;
+        var y = canvas.height - moveSideLength;
+        var yText = y  + moveSideLength / 2 - moveFontSize / 2;
 
         var sprite = RudeDudesGame.game.add.sprite(x,y);
           var graphics = RudeDudesGame.game.add.graphics(0,0);
-          var text = RudeDudesGame.game.add.text(sideLength/2,sideLength/2,text,{'fontSize':fontSize,'align':'center','width':sideLength});
+          var text = RudeDudesGame.game.add.text(moveSideLength/2,moveSideLength/2,text,{'fontSize':moveFontSize,'align':'center','width':moveSideLength});
           text.anchor.x = Math.round(text.width * 0.5) / text.width;
           text.anchor.y = Math.round(text.height * 0.5) / text.height;
 
             // set a fill and line style
           graphics.beginFill(color);
           graphics.lineStyle(1, 'black', 1);
-          graphics.drawRect(0,0,sideLength,sideLength);
+          graphics.drawRect(0,0,moveSideLength,moveSideLength);
           
         sprite.addChild(graphics);
         sprite.addChild(text);
@@ -348,11 +361,11 @@ RudeDudesGame.Encounter.prototype = {
 
       };
       
-      drawButton((3/16),.125,'(Passive)',encounter.myDude.moves.passive);
-      drawButton((5/16),.125,'(Ability 1)',encounter.myDude.moves.ability1);
-      drawButton((7/16),.125,'(Ability 2)',encounter.myDude.moves.ability2);
-      drawButton((9/16),.125,'(Ability 3)',encounter.myDude.moves.ability3);
-      drawButton((11/16),.125,'(Ultimate)',encounter.myDude.moves.ult);
+      drawButton((3/16),'(Passive)',encounter.myDude.moves.passive);
+      drawButton((5/16),'(Ability 1)',encounter.myDude.moves.ability1);
+      drawButton((7/16),'(Ability 2)',encounter.myDude.moves.ability2);
+      drawButton((9/16),'(Ability 3)',encounter.myDude.moves.ability3);
+      drawButton((11/16),'(Ultimate)',encounter.myDude.moves.ult);
     };
 
     canvas.drawHUD = function(encounter) {
@@ -405,6 +418,13 @@ RudeDudesGame.Encounter.prototype = {
       this.encounter.myTurn = true;
     }
 
+    
+
+    if (this.encounter.enemyDude.stats.HP === 0) {
+
+      this.encounter.canvas.displayEndingText(this.encounter);
+
+    }
 
   }
 }
