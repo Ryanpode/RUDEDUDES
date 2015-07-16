@@ -164,17 +164,19 @@ RudeDudesGame.Game.prototype = {
     this.player.body.velocity.y = 0;
     this.player.body.velocity.x = 0;
 
+    var movementSpeed = 200;
+
     if(this.cursors.up.isDown) {
-      this.player.body.velocity.y -= 500;
+      this.player.body.velocity.y -= movementSpeed;
     }
     else if(this.cursors.down.isDown) {
-      this.player.body.velocity.y += 500;
+      this.player.body.velocity.y += movementSpeed;
     }
     if(this.cursors.left.isDown) {
-      this.player.body.velocity.x -= 500;
+      this.player.body.velocity.x -= movementSpeed;
     }
     else if(this.cursors.right.isDown) {
-      this.player.body.velocity.x += 500;
+      this.player.body.velocity.x += movementSpeed;
     }
   },
   collect: function(player, collectable) {
@@ -184,8 +186,12 @@ RudeDudesGame.Game.prototype = {
     collectable.destroy();
   },
   enterGrass: function(player, door) {
-    
-    this.state.start('Encounter');
+    if (this.cursors.up.isDown || this.cursors.down.isDown || this.cursors.left.isDown || this.cursors.right.isDown) {
+      var randomCheck = Math.random() * 60;
+      if (randomCheck < 1) {
+        this.state.start('Encounter');
+      }
+    }
   }
 };
 //encounter
@@ -249,7 +255,7 @@ RudeDudesGame.Encounter.prototype = {
     var nameFontSize = canvasHeight * .04;
     var moveFontSize = canvasHeight * .04;
     var eventFontSize = canvasHeight * .03;
-    var endingFontSize = canvasHeight * .1;
+    var endingFontSize = canvasHeight * .08;
 
     canvas.drawTopHUD = function(encounter) {
       
@@ -314,8 +320,8 @@ RudeDudesGame.Encounter.prototype = {
 
     canvas.displayEndingText = function(encounter) {
       var enemyDudeName = encounter.enemyDude.dudeInfo.name;
-      var endingText = encounter.enemyDude.dudeInfo.name + " has DIED!";
-      var text = RudeDudesGame.game.add.text(320,100,endingText,{'fontSize':endingFontSize});
+      var endingText = "Enemy " + encounter.enemyDude.dudeInfo.name + " has DIED!";
+      var text = RudeDudesGame.game.add.text(320,120,endingText,{'fontSize':endingFontSize});
       text.x -= text.width / 2;
       RudeDudesGame.game.time.events.add(1000, function() {
         text.destroy();
@@ -418,7 +424,7 @@ RudeDudesGame.Encounter.prototype = {
       this.encounter.myTurn = true;
     }
 
-    
+
 
     if (this.encounter.enemyDude.stats.HP === 0) {
 
