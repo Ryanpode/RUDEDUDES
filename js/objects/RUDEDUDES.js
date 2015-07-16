@@ -41,12 +41,6 @@ var RUDEDUDES = (function (my, $) {
 		};
 
 		dude.moveResults = {};
-		dude.setMoveResults = function(move,damage,effects){
-			dude.moveResults.move = move;
-			dude.moveResults.damage = damage;
-			dude.moveResults.effects = effects;
-		};
-
 		return dude;
 	};
 	my.stats = function(HP, Atk, Def, Spd){

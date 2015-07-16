@@ -201,7 +201,7 @@ RudeDudesGame.Encounter.prototype = {
       dudeDefaultStats: stats2,
       moves: {
         passive: -1,
-        ability1: 0,
+        ability1: 1,
         ability2: -1,
         ability3: -1,
         ult: -2
@@ -221,6 +221,14 @@ RudeDudesGame.Encounter.prototype = {
 
     canvas.graphicsMyHP = RudeDudesGame.game.add.graphics();
     canvas.graphicsEnemyHP = RudeDudesGame.game.add.graphics();
+/*
+    canvas.leftText1 = "";
+    canvas.leftText2 = "";
+    canvas.leftText3 = "";
+
+    canvas.rightText1 = "";
+    canvas.rightText2 = "";
+    canvas.rightText3 = "";*/
 
     var canvasWidth = canvas.width;
     var canvasHeight = canvas.height;
@@ -274,10 +282,33 @@ RudeDudesGame.Encounter.prototype = {
       enemyText.x -= enemyText.width;
               
     };
-    canvas.displayMoveText = function(encounter) {
+    canvas.displayMyMoveText = function(encounter) {
       var myDudeName = encounter.myDude.dudeInfo.name;
+      var moveResults = encounter.myDude.moveResults;
+      var moveText = myDudeName + " used " + moveResults.move.moveName;
+      var text = RudeDudesGame.game.add.text(50,100,moveText,{'fontSize':fontSize});
+      RudeDudesGame.game.time.events.add(1000, function() {
+        text.destroy();
+      }, this);
+
+      console.log(moveText);
 
     };
+    canvas.displayEnemyMoveText = function(encounter) {
+      var enemyDudeName = encounter.enemyDude.dudeInfo.name;
+      var moveResults = encounter.enemyDude.moveResults;
+      var moveText = enemyDudeName + " used " + moveResults.move.moveName;
+      var text = RudeDudesGame.game.add.text(570,100,moveText,{'fontSize':fontSize});
+      text.x -= text.width
+      RudeDudesGame.game.time.events.add(1000, function() {
+        text.destroy();
+      }, this);
+
+      console.log(moveText);
+
+    };
+
+
     canvas.drawMoveButtons = function(encounter) {
       var moveEffects = RUDEDUDES.moveEffects;
       var drawButton = function(xRatio,sideRatio,defaultText,move){
@@ -340,16 +371,40 @@ RudeDudesGame.Encounter.prototype = {
   update: function() {
 
     if (this.encounter.myDude.moveComplete) {
+
+      //display move text
+      this.encounter.canvas.displayMyMoveText(this.encounter);
+
+      //run animations
+
+      //update affteced HUD elements
       this.encounter.canvas.updateHP(this.encounter);
+
+      //reset state
       this.encounter.myDude.moveComplete = false;
+      this.encounter.myDude.moveResults = {};
       this.encounter.myTurn = false;
+
+      //use enemy move
       this.encounter.useEnemyMove();
     }
 
     if (this.encounter.enemyDude.moveComplete) {
+
+      //display move text
+      this.encounter.canvas.displayEnemyMoveText(this.encounter);
+
+      //run animations
+
+      //update affteced HUD elements
       this.encounter.canvas.updateHP(this.encounter);
+
+      //reset state
       this.encounter.enemyDude.moveComplete = false;
+      this.encounter.enemyDude.moveResults = {};
       this.encounter.myTurn = true;
     }
+
+
   }
 }
