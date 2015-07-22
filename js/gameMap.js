@@ -4,12 +4,12 @@ var stats1 = new RUDEDUDES.stats(100,3,4,5);
     var moveList = new RUDEDUDES.moveList(RUDEDUDES);
     
     var config1 = {
-      dudeID: 0,
+      dudeID: 1,
       dudeStats: stats1,
       dudeDefaultStats: stats1,
       moves: {
         passive: -1,
-        ability1: 0,
+        ability1: 1,
         ability2: -1,
         ability3: -1,
         ult: -2
@@ -194,6 +194,14 @@ RudeDudesGame.Game.prototype = {
     }
   }
 };
+RudeDudesGame.GameOver = function(){};
+RudeDudesGame.GameOver.prototype = {
+  create: function() {
+    var textSize = canvas.height * .3;
+    var gameOverText = RudeDudesGame.game.add.text(canvas.width/2,canvas.height/2,'GAME OVER',{'fontSize':textSize});
+    gameOverText.x -= gameOverText.width / 2;
+  }
+};
 //encounter
 RudeDudesGame.Encounter = function(){};
 RudeDudesGame.Encounter.prototype = {
@@ -202,12 +210,12 @@ RudeDudesGame.Encounter.prototype = {
 
     var stats2 = new RUDEDUDES.stats(100,4,3,2);
     var config2 = {
-      dudeID: 1,
+      dudeID: 0,
       dudeStats: stats2,
       dudeDefaultStats: stats2,
       moves: {
         passive: -1,
-        ability1: 1,
+        ability1: 0,
         ability2: -1,
         ability3: -1,
         ult: -2
@@ -252,9 +260,9 @@ RudeDudesGame.Encounter.prototype = {
     var xMyMove = canvasWidth*xPaddingRatio;
     var xEnemyMove = canvasWidth - canvasWidth*xRatio - canvasWidth*(xPaddingRatio);
 
-    var myText = RudeDudesGame.game.add.text(xMyTotal,yText,this.encounter.myDude.dudeInfo.name,{'fontSize':nameFontSize});
-    var enemyText = RudeDudesGame.game.add.text(xEnemyTotal + width,yText,this.encounter.enemyDude.dudeInfo.name,{'fontSize':nameFontSize});
-    enemyText.x -= enemyText.width;
+    canvas.myText = RudeDudesGame.game.add.text(xMyTotal,yText,this.encounter.myDude.dudeInfo.name,{'fontSize':nameFontSize});
+    canvas.enemyText = RudeDudesGame.game.add.text(xEnemyTotal + width,yText,this.encounter.enemyDude.dudeInfo.name,{'fontSize':nameFontSize});
+    canvas.enemyText.x -= canvas.enemyText.width;
     
     canvas.myMoveText = RudeDudesGame.game.add.text(xMyMove,yMove,'',{'fontSize':eventFontSize});
     canvas.enemyMoveText = RudeDudesGame.game.add.text(xEnemyMove,yMove,'',{'fontSize':eventFontSize});
@@ -266,7 +274,13 @@ RudeDudesGame.Encounter.prototype = {
 
         var widthMyHP = canvasWidth * xRatio * (encounter.myDude.stats.HP / encounter.myDude.defaultStats.HP);
         var widthEnemyHP = canvasWidth * xRatio * (encounter.enemyDude.stats.HP / encounter.enemyDude.defaultStats.HP);
-      
+        
+        canvas.myText.destroy();
+        canvas.enemyText.destroy();
+
+        canvas.myText = RudeDudesGame.game.add.text(xMyTotal,yText,encounter.myDude.dudeInfo.name,{'fontSize':nameFontSize});
+        canvas.enemyText = RudeDudesGame.game.add.text(xEnemyTotal + width,yText,encounter.enemyDude.dudeInfo.name,{'fontSize':nameFontSize});
+
         var drawHP = function(x,y,width,height,widthHP,graphics) {
             graphics.clear();
             
@@ -323,7 +337,6 @@ RudeDudesGame.Encounter.prototype = {
 
     };
 
-
     canvas.displayEnemyDeadText = function(encounter) {
       var enemyDudeName = encounter.enemyDude.dudeInfo.name;
       var endingText = "Enemy " + encounter.enemyDude.dudeInfo.name + " has DIED!";
@@ -334,7 +347,7 @@ RudeDudesGame.Encounter.prototype = {
 
     canvas.displayMyDeadText = function(encounter) {
       var enemyDudeName = encounter.enemyDude.dudeInfo.name;
-      var endingText = "All of your dudes have DIED!";
+      var endingText = encounter.myDude.dudeInfo.name + " has DIED!";
       var text = RudeDudesGame.game.add.text(320,120,endingText,{'fontSize':endingFontSize});
       text.x -= text.width / 2;
       return text;
@@ -402,7 +415,7 @@ RudeDudesGame.Encounter.prototype = {
 
     var postMyDudeDead = function(encounter) {
       if (encounter.lose) {
-        RudeDudesGame.game.state.start('Game');
+        RudeDudesGame.game.state.start('GameOver');
       } else {
         encounter.myDude = encounter.myPlayer.getStartingDude();
         encounter.canvas.drawHUD(encounter);

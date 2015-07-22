@@ -55,11 +55,11 @@ var RUDEDUDES = (function (my, $) {
 	my.dudeList = function() {
 		var dudes = [
 			{
-				name: 'Cool Guy',
+				name: 'Duff',
 				type: 'Water'
 			},
 			{
-				name: 'Tom',
+				name: 'Theseus',
 				type: 'Fire'
 			},
 			{
