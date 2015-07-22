@@ -21,7 +21,7 @@ var stats1 = new RUDEDUDES.stats(100,3,4,5);
       dudeDefaultStats:  new RUDEDUDES.stats(100,3,4,5),
       moves: {
         passive: -1,
-        ability1: 1,
+        ability1: 2,
         ability2: -1,
         ability3: -1,
         ult: -2
@@ -229,14 +229,6 @@ RudeDudesGame.Encounter.prototype = {
 
     canvas.graphicsMyHP = RudeDudesGame.game.add.graphics();
     canvas.graphicsEnemyHP = RudeDudesGame.game.add.graphics();
-/*
-    canvas.leftText1 = "";
-    canvas.leftText2 = "";
-    canvas.leftText3 = "";
-
-    canvas.rightText1 = "";
-    canvas.rightText2 = "";
-    canvas.rightText3 = "";*/
 
     var canvasWidth = canvas.width;
     var canvasHeight = canvas.height;
@@ -256,6 +248,16 @@ RudeDudesGame.Encounter.prototype = {
     var moveFontSize = canvasHeight * .04;
     var eventFontSize = canvasHeight * .03;
     var endingFontSize = canvasHeight * .08;
+    var yMove = canvasHeight * .3;
+    var xMyMove = canvasWidth*xPaddingRatio;
+    var xEnemyMove = canvasWidth - canvasWidth*xRatio - canvasWidth*(xPaddingRatio);
+
+    var myText = RudeDudesGame.game.add.text(xMyTotal,yText,this.encounter.myDude.dudeInfo.name,{'fontSize':nameFontSize});
+    var enemyText = RudeDudesGame.game.add.text(xEnemyTotal + width,yText,this.encounter.enemyDude.dudeInfo.name,{'fontSize':nameFontSize});
+    enemyText.x -= enemyText.width;
+    
+    canvas.myMoveText = RudeDudesGame.game.add.text(xMyMove,yMove,'',{'fontSize':eventFontSize});
+    canvas.enemyMoveText = RudeDudesGame.game.add.text(xEnemyMove,yMove,'',{'fontSize':eventFontSize});
 
     canvas.drawTopHUD = function(encounter) {
       
@@ -289,17 +291,18 @@ RudeDudesGame.Encounter.prototype = {
 
       canvas.updateHP(encounter);
 
-      var myText = RudeDudesGame.game.add.text(xMyTotal,yText,encounter.myDude.dudeInfo.name,{'fontSize':nameFontSize});
-      var enemyText = RudeDudesGame.game.add.text(xEnemyTotal + width,yText,encounter.enemyDude.dudeInfo.name,{'fontSize':nameFontSize});
-      enemyText.x -= enemyText.width;
+      canvas.myMoveText;
+      canvas.enemyMoveText;
               
     };
 
     canvas.displayMyMoveText = function(encounter) {
+      canvas.myMoveText.destroy();
       var myDudeName = encounter.myDude.dudeInfo.name;
       var moveResults = encounter.myDude.moveResults;
       var moveText = myDudeName + " used " + moveResults.move.moveName;
       var text = RudeDudesGame.game.add.text(50,100,moveText,{'fontSize':eventFontSize});
+      canvas.myMoveText = text;
       RudeDudesGame.game.time.events.add(1000, function() {
         text.destroy();
       }, this);
@@ -307,27 +310,34 @@ RudeDudesGame.Encounter.prototype = {
     };
 
     canvas.displayEnemyMoveText = function(encounter) {
+      canvas.enemyMoveText.destroy();
       var enemyDudeName = encounter.enemyDude.dudeInfo.name;
       var moveResults = encounter.enemyDude.moveResults;
       var moveText = enemyDudeName + " used " + moveResults.move.moveName;
       var text = RudeDudesGame.game.add.text(570,100,moveText,{'fontSize':eventFontSize});
       text.x -= text.width
+      canvas.enemyMoveText = text;
       RudeDudesGame.game.time.events.add(1000, function() {
         text.destroy();
       }, this);
 
     };
 
-    canvas.displayEndingText = function(encounter) {
+
+    canvas.displayEnemyDeadText = function(encounter) {
       var enemyDudeName = encounter.enemyDude.dudeInfo.name;
       var endingText = "Enemy " + encounter.enemyDude.dudeInfo.name + " has DIED!";
       var text = RudeDudesGame.game.add.text(320,120,endingText,{'fontSize':endingFontSize});
       text.x -= text.width / 2;
-      RudeDudesGame.game.time.events.add(1000, function() {
-        text.destroy();
-        console.log(RudeDudesGame);
-        RudeDudesGame.game.state.start('Game');
-      }, this);
+      return text;
+    };
+
+    canvas.displayMyDeadText = function(encounter) {
+      var enemyDudeName = encounter.enemyDude.dudeInfo.name;
+      var endingText = "All of your dudes have DIED!";
+      var text = RudeDudesGame.game.add.text(320,120,endingText,{'fontSize':endingFontSize});
+      text.x -= text.width / 2;
+      return text;
     };
 
     canvas.drawMoveButtons = function(encounter) {
@@ -377,6 +387,7 @@ RudeDudesGame.Encounter.prototype = {
     canvas.drawHUD = function(encounter) {
       canvas.graphicsStaticHUD.clear();
 
+
       //canvas.layers.HUD.removeChildren();
       canvas.drawMoveButtons(encounter);
       canvas.drawTopHUD(encounter);
@@ -388,6 +399,25 @@ RudeDudesGame.Encounter.prototype = {
 
   },
   update: function() {
+
+    var postMyDudeDead = function(encounter) {
+      if (encounter.lose) {
+        RudeDudesGame.game.state.start('Game');
+      } else {
+        encounter.myDude = encounter.myPlayer.getStartingDude();
+        encounter.canvas.drawHUD(encounter);
+      }
+    };
+
+    var postEnemyDudeDead = function(encounter) {
+      console.log(encounter);
+      if (encounter.win) {
+          RudeDudesGame.game.state.start('Game');
+      } else {
+        encounter.enemyDude = encounter.enemyPlayer.getStartingDude();
+        encounter.canvas.drawHUD(encounter);
+      }
+    }; 
 
     if (this.encounter.myDude.moveComplete) {
 
@@ -404,6 +434,22 @@ RudeDudesGame.Encounter.prototype = {
       this.encounter.myDude.moveResults = {};
       this.encounter.myTurn = false;
 
+      //check for dead dudes
+      if (this.encounter.myDude.stats.HP <= 0) {
+        var text = this.encounter.canvas.displayMyDeadText(this.encounter);
+        RudeDudesGame.game.time.events.add(700, function() {
+          text.destroy();
+          postMyDudeDead(this.encounter);
+        }, this);
+      }
+      if (this.encounter.enemyDude.stats.HP <= 0) {
+        var text = this.encounter.canvas.displayEnemyDeadText(this.encounter);
+        RudeDudesGame.game.time.events.add(700, function() {
+          text.destroy();
+          postEnemyDudeDead(this.encounter);
+        }, this);
+      }
+
       //use enemy move
       this.encounter.useEnemyMove();
     }
@@ -418,6 +464,22 @@ RudeDudesGame.Encounter.prototype = {
       //update affteced HUD elements
       this.encounter.canvas.updateHP(this.encounter);
 
+      //check for dead dudes
+      if (this.encounter.myDude.stats.HP <= 0) {
+        var text = this.encounter.canvas.displayMyDeadText(this.encounter);
+        RudeDudesGame.game.time.events.add(700, function() {
+          text.destroy();
+          postMyDudeDead(this.encounter);
+        }, this);
+      }
+      if (this.encounter.enemyDude.stats.HP <= 0) {
+        var text = this.encounter.canvas.displayEnemyDeadText(this.encounter);
+        RudeDudesGame.game.time.events.add(700, function() {
+          text.destroy();
+          postEnemyDudeDead(this.encounter);
+        }, this);
+      }
+
       //reset state
       this.encounter.enemyDude.moveComplete = false;
       this.encounter.enemyDude.moveResults = {};
@@ -425,12 +487,6 @@ RudeDudesGame.Encounter.prototype = {
     }
 
 
-
-    if (this.encounter.enemyDude.stats.HP === 0) {
-
-      this.encounter.canvas.displayEndingText(this.encounter);
-
-    }
 
   }
 }

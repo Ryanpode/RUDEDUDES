@@ -143,13 +143,15 @@ var RUDEDUDES = (function (my, $) {
 			}
 			attackingDude.moveResults = myResults;
 			attackingDude.moveComplete = true;
+			encounter.checkWinLose();
 		};
 		return this;
 	}(my.moveEffects || {});
 	my.moveList = function(){
 		var moves = [
-			new my.move('Watershot', 'Water', 'AtWill', '2', 'Shoots water', ['damageTarget']),
-			new my.move('Firestick', 'Fire', 'AtWill', '2', 'Hit him with a firestick', ['damageTarget'])
+			new my.move('Watershot', 'Water', 'AtWill', '8', 'Shoots water', ['damageTarget']),
+			new my.move('Firestick', 'Fire', 'AtWill', '8', 'Hit him with a firestick', ['damageTarget']),
+			new my.move('Firetooth', 'Fire', 'AtWill', '8', 'Hit him with a firestick', ['damageTarget'])
 		];
 		var getMove = function(index){return moves[index];}
 		return  {
@@ -173,7 +175,19 @@ var RUDEDUDES = (function (my, $) {
 		encounter.enemyDude.moveComplete = false;
 		encounter.enemyDude.moveResults = {};
 
+		encounter.win = false;
+		encounter.lose = false;
+
 		encounter.myTurn = true;
+
+		encounter.checkWinLose = function() {
+			if (myPlayer.getStartingDude() < 0) {
+				encounter.lose = true;
+			}
+			if (enemyPlayer.getStartingDude() < 0) {
+				encounter.win = true;
+			}
+		}
 
 		encounter.getEnemyMove = function() {
 			return encounter.enemyDude.moves.ability1;
