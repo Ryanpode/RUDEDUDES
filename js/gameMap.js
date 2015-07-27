@@ -390,6 +390,37 @@ RudeDudesGame.Encounter.prototype = {
 
       };
       
+      var drawBoxButton = function(xRatio){
+        
+        var color = 0x008888;
+        var text = 'Throw Box';
+        var moveEffect = function(){};
+                
+        var x = canvas.width * xRatio;
+        var y = canvas.height - moveSideLength;
+        var yText = y  + moveSideLength / 2 - moveFontSize / 2;
+
+        var sprite = RudeDudesGame.game.add.sprite(x,y);
+          var graphics = RudeDudesGame.game.add.graphics(0,0);
+          var text = RudeDudesGame.game.add.text(moveSideLength/2,moveSideLength/2,text,{'fontSize':moveFontSize,'align':'center','width':moveSideLength});
+          text.anchor.x = Math.round(text.width * 0.5) / text.width;
+          text.anchor.y = Math.round(text.height * 0.5) / text.height;
+
+            // set a fill and line style
+          graphics.beginFill(color);
+          graphics.lineStyle(1, 'black', 1);
+          graphics.drawRect(0,0,moveSideLength,moveSideLength);
+          
+        sprite.addChild(graphics);
+        sprite.addChild(text);
+
+        sprite.inputEnabled = true;
+        sprite.events.onInputDown.add(function(){encounter.throwBox()}, this);
+
+      };
+
+      drawBoxButton(0);
+
       drawButton((3/16),'(Passive)',encounter.myDude.moves.passive);
       drawButton((5/16),'(Ability 1)',encounter.myDude.moves.ability1);
       drawButton((7/16),'(Ability 2)',encounter.myDude.moves.ability2);

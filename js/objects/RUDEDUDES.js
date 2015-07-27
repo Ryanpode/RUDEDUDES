@@ -55,11 +55,11 @@ var RUDEDUDES = (function (my, $) {
 	my.dudeList = function() {
 		var dudes = [
 			{
-				name: 'Duff',
+				name: 'Cool Guy',
 				type: 'Water'
 			},
 			{
-				name: 'Theseus',
+				name: 'Tom',
 				type: 'Fire'
 			},
 			{
@@ -180,6 +180,10 @@ var RUDEDUDES = (function (my, $) {
 
 		encounter.myTurn = true;
 
+		encounter.throwBox = function() {
+			
+		};
+
 		encounter.checkWinLose = function() {
 			if (myPlayer.getStartingDude() < 0) {
 				encounter.lose = true;
@@ -187,7 +191,7 @@ var RUDEDUDES = (function (my, $) {
 			if (enemyPlayer.getStartingDude() < 0) {
 				encounter.win = true;
 			}
-		}
+		};
 
 		encounter.getEnemyMove = function() {
 			return encounter.enemyDude.moves.ability1;
