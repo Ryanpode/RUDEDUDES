@@ -177,11 +177,14 @@ var RUDEDUDES = (function (my, $) {
 
 		encounter.win = false;
 		encounter.lose = false;
+		encounter.dudeBoxed = false;
 
 		encounter.myTurn = true;
 
 		encounter.throwBox = function() {
-			
+			encounter.myPlayer.dudes.push(encounter.enemyDude);
+			encounter.moveComplete = true;
+			encounter.dudeBoxed = true;
 		};
 
 		encounter.checkWinLose = function() {

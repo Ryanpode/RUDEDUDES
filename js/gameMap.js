@@ -338,7 +338,6 @@ RudeDudesGame.Encounter.prototype = {
     };
 
     canvas.displayEnemyDeadText = function(encounter) {
-      var enemyDudeName = encounter.enemyDude.dudeInfo.name;
       var endingText = "Enemy " + encounter.enemyDude.dudeInfo.name + " has DIED!";
       var text = RudeDudesGame.game.add.text(320,120,endingText,{'fontSize':endingFontSize});
       text.x -= text.width / 2;
@@ -346,8 +345,14 @@ RudeDudesGame.Encounter.prototype = {
     };
 
     canvas.displayMyDeadText = function(encounter) {
-      var enemyDudeName = encounter.enemyDude.dudeInfo.name;
       var endingText = encounter.myDude.dudeInfo.name + " has DIED!";
+      var text = RudeDudesGame.game.add.text(320,120,endingText,{'fontSize':endingFontSize});
+      text.x -= text.width / 2;
+      return text;
+    };
+
+    canvas.displayDudeBoxedText = function(encounter) {
+      var endingText = encounter.enemyDude.dudeInfo.name + " has been BOXED!";
       var text = RudeDudesGame.game.add.text(320,120,endingText,{'fontSize':endingFontSize});
       text.x -= text.width / 2;
       return text;
@@ -463,6 +468,11 @@ RudeDudesGame.Encounter.prototype = {
       }
     }; 
 
+    var postEnemyDudeBoxed = function(encounter) {
+      console.log(encounter);
+      RudeDudesGame.game.state.start('Game');
+    }; 
+
     if (this.encounter.myDude.moveComplete) {
 
       //display move text
@@ -530,7 +540,13 @@ RudeDudesGame.Encounter.prototype = {
       this.encounter.myTurn = true;
     }
 
-
+    if (this.encounter.dudeBoxed) {
+      var text = this.encounter.canvas.displayDudeBoxedText(this.encounter);
+      RudeDudesGame.game.time.events.add(700, function() {
+        text.destroy();
+        postEnemyDudeBoxed(this.encounter);
+      }, this);
+    }
 
   }
 }
