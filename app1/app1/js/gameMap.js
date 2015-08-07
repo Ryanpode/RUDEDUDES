@@ -261,9 +261,10 @@ RudeDudesGame.Encounter.prototype = {
     var xEnemyMove = canvasWidth - canvasWidth*xRatio - canvasWidth*(xPaddingRatio);
 
     canvas.myText = RudeDudesGame.game.add.text(xMyTotal,yText,this.encounter.myDude.dudeInfo.name,{'fontSize':nameFontSize});
-    canvas.enemyText = RudeDudesGame.game.add.text(xEnemyTotal + width,yText,this.encounter.enemyDude.dudeInfo.name,{'fontSize':nameFontSize});
+    canvas.enemyText = RudeDudesGame.game.add.text(xEnemyTotal + width, yText, this.encounter.enemyDude.dudeInfo.name, { 'fontSize': nameFontSize });
     canvas.enemyText.x -= canvas.enemyText.width;
     
+
     canvas.myMoveText = RudeDudesGame.game.add.text(xMyMove,yMove,'',{'fontSize':eventFontSize});
     canvas.enemyMoveText = RudeDudesGame.game.add.text(xEnemyMove,yMove,'',{'fontSize':eventFontSize});
 
@@ -279,7 +280,8 @@ RudeDudesGame.Encounter.prototype = {
         canvas.enemyText.destroy();
 
         canvas.myText = RudeDudesGame.game.add.text(xMyTotal,yText,encounter.myDude.dudeInfo.name,{'fontSize':nameFontSize});
-        canvas.enemyText = RudeDudesGame.game.add.text(xEnemyTotal + width,yText,encounter.enemyDude.dudeInfo.name,{'fontSize':nameFontSize});
+        canvas.enemyText = RudeDudesGame.game.add.text(xEnemyTotal + width, yText, encounter.enemyDude.dudeInfo.name, { 'fontSize': nameFontSize });
+        canvas.enemyText.x -= canvas.enemyText.width;
 
         var drawHP = function(x,y,width,height,widthHP,graphics) {
             graphics.clear();
